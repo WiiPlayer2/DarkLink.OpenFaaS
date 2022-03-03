@@ -5,7 +5,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-		<VersionPrefix>0.0.1</VersionPrefix>
+		<VersionPrefix>0.0.2</VersionPrefix>
 		<Authors>WiiPlayer2</Authors>
 		<RepositoryUrl>https://github.com/WiiPlayer2/DarkLink.OpenFaaS</RepositoryUrl>
 	</PropertyGroup>
