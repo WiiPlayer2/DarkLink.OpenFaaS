@@ -2,11 +2,21 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Configuration;
 
 namespace DarkLink.OpenFaaS;
 
 public static class Extensions
 {
+    public static IConfigurationBuilder AddOpenFaaSSecrets(this IConfigurationBuilder configurationBuilder, params (string SecretName, string ConfigName)[] mapping)
+        => configurationBuilder.AddOpenFaaSSecrets(mapping.ToDictionary(o => o.SecretName, o => o.ConfigName));
+
+    public static IConfigurationBuilder AddOpenFaaSSecrets(this IConfigurationBuilder configurationBuilder, IReadOnlyDictionary<string, string> mapping)
+    {
+        configurationBuilder.Add(new SecretsConfigurationSource(mapping));
+        return configurationBuilder;
+    }
+
     public static IEndpointConventionBuilder MapFunction<TInput>(this IEndpointRouteBuilder builder, FunctionObjectDelegate<TInput> function)
         => builder.MapFunction(async (context, requestString) =>
         {
