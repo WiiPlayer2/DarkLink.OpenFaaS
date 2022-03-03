@@ -18,6 +18,9 @@ public static class Extensions
     }
 
     public static IEndpointConventionBuilder MapFunction<TInput>(this IEndpointRouteBuilder builder, FunctionObjectDelegate<TInput> function)
+        => builder.MapFunction<TInput>((context, input) => Task.FromResult(function(context, input)));
+
+    public static IEndpointConventionBuilder MapFunction<TInput>(this IEndpointRouteBuilder builder, FunctionObjectAsyncDelegate<TInput> function)
         => builder.MapFunction(async (context, requestString) =>
         {
             var input = JsonSerializer.Deserialize<TInput>(requestString);
@@ -27,6 +30,9 @@ public static class Extensions
         });
 
     public static IEndpointConventionBuilder MapFunction(this IEndpointRouteBuilder builder, FunctionStringDelegate function)
+        => builder.MapFunction((context, requestString) => Task.FromResult(function(context, requestString)));
+
+    public static IEndpointConventionBuilder MapFunction(this IEndpointRouteBuilder builder, FunctionStringAsyncDelegate function)
         => builder.MapFunction(async context =>
         {
             using var reader = new StreamReader(context.Request.Body);
@@ -39,7 +45,7 @@ public static class Extensions
             await context.Response.CompleteAsync();
         });
 
-    public static IEndpointConventionBuilder MapFunction(this IEndpointRouteBuilder builder, Delegates function)
+    public static IEndpointConventionBuilder MapFunction(this IEndpointRouteBuilder builder, FunctionContextDelegate function)
         => builder.MapPost("/", async context =>
         {
             try
