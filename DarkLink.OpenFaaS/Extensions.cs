@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace DarkLink.OpenFaaS;
 
@@ -15,6 +16,16 @@ public static class Extensions
     {
         configurationBuilder.Add(new SecretsConfigurationSource(mapping));
         return configurationBuilder;
+    }
+
+    public static IServiceCollection AddGatewayClient(this IServiceCollection services)
+        => services.AddSingleton(sp => new GatewayClient(new Uri(sp.GetRequiredService<IConfiguration>().GetValue<string>("OPENFAAS_URL"))));
+
+    public static WebApplicationBuilder AddOpenFaaS(this WebApplicationBuilder builder, params (string SecretName, string ConfigName)[] secretsMapping)
+    {
+        builder.Configuration.AddOpenFaaSSecrets(secretsMapping);
+        builder.Services.AddGatewayClient();
+        return builder;
     }
 
     public static IEndpointConventionBuilder MapFunction<TInput>(this IEndpointRouteBuilder builder, FunctionObjectDelegate<TInput> function)
