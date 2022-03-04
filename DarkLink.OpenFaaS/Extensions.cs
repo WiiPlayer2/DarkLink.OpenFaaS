@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Net;
+using System.Text.Json;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -66,6 +67,9 @@ public static class Extensions
             catch (Exception e)
             {
                 Console.WriteLine(e);
+
+                context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+
                 await using var writer = new StreamWriter(context.Response.Body);
                 await writer.WriteAsync(e.ToString());
                 await writer.FlushAsync();
