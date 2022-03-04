@@ -27,16 +27,12 @@ public class GatewayClient
 
     private async Task<HttpResponseMessage> SendAsync(bool isAsync, string function, HttpContent content, CancellationToken cancellationToken)
     {
-        var basePath = isAsync ? "async-function" : "function";
-        var response = await httpClient.PostAsync($"/{basePath}/{function}", content, cancellationToken);
+        var response = await httpClient.PostAsync(GetUrl(isAsync, function), content, cancellationToken);
 
-        if (!response.IsSuccessStatusCode)
-        {
-            var errorMessage = await response.Content.ReadAsStringAsync(cancellationToken);
-            throw new RemoteException(response, errorMessage);
-        }
+        if (response.IsSuccessStatusCode) return response;
 
-        return response;
+        var errorMessage = await response.Content.ReadAsStringAsync(cancellationToken);
+        throw new RemoteException(response, errorMessage);
     }
 
     public async Task<Guid> CallAsync(string function, string? arg, string? callbackUrl = default, CancellationToken cancellationToken = default)
@@ -65,6 +61,12 @@ public class GatewayClient
         var responseString = response.Content.ReadAsStringAsync(cancellationToken);
         return await responseString;
     }
+
+    private Uri GetUrl(bool isAsync, string function) => new(httpClient.BaseAddress!, $"/{(isAsync ? "async-function" : "function")}/{function}");
+
+    public Uri GetUrl(string function) => GetUrl(false, function);
+
+    public Uri GetAsyncUrl(string function) => GetUrl(true, function);
 
     public async Task<TOutput?> InvokeAsync<TOutput>(string function, object? arg, JsonSerializerOptions? jsonOptions = null, CancellationToken cancellationToken = default)
     {
