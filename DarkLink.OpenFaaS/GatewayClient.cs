@@ -25,10 +25,18 @@ namespace DarkLink.OpenFaaS
             };
         }
 
-        private Task<HttpResponseMessage> SendAsync(bool isAsync, string function, HttpContent content, CancellationToken cancellationToken)
+        private async Task<HttpResponseMessage> SendAsync(bool isAsync, string function, HttpContent content, CancellationToken cancellationToken)
         {
             var basePath = isAsync ? "async-function" : "function";
-            return httpClient.PostAsync($"/{basePath}/{function}", content, cancellationToken);
+            var response = await httpClient.PostAsync($"/{basePath}/{function}", content, cancellationToken);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorMessage = await response.Content.ReadAsStringAsync(cancellationToken);
+                throw new RemoteException(response, errorMessage);
+            }
+
+            return response;
         }
 
         public async Task<Guid> CallAsync(string function, string? arg, string? callbackUrl = default, CancellationToken cancellationToken = default)
