@@ -29,15 +29,15 @@ public static class Extensions
         return builder;
     }
 
-    public static IEndpointConventionBuilder MapFunction<TInput>(this IEndpointRouteBuilder builder, FunctionObjectDelegate<TInput> function)
-        => builder.MapFunction<TInput>((context, input) => Task.FromResult(function(context, input)));
+    public static IEndpointConventionBuilder MapFunction<TInput>(this IEndpointRouteBuilder builder, FunctionObjectDelegate<TInput> function, JsonSerializerOptions? jsonOptions = null)
+        => builder.MapFunction<TInput>((context, input) => Task.FromResult(function(context, input)), jsonOptions);
 
-    public static IEndpointConventionBuilder MapFunction<TInput>(this IEndpointRouteBuilder builder, FunctionObjectAsyncDelegate<TInput> function)
+    public static IEndpointConventionBuilder MapFunction<TInput>(this IEndpointRouteBuilder builder, FunctionObjectAsyncDelegate<TInput> function, JsonSerializerOptions? jsonOptions = null)
         => builder.MapFunction(async (context, requestString) =>
         {
-            var input = JsonSerializer.Deserialize<TInput>(requestString);
+            var input = JsonSerializer.Deserialize<TInput>(requestString, jsonOptions);
             var output = await function(context, input);
-            var responseString = JsonSerializer.Serialize(output);
+            var responseString = JsonSerializer.Serialize(output, jsonOptions);
             return responseString;
         });
 
