@@ -4,8 +4,7 @@
 		<TargetFramework>net6.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
-		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-		<VersionPrefix>0.0.3</VersionPrefix>
+		<VersionPrefix>0.0.4</VersionPrefix>
 		<VersionSuffix>dev</VersionSuffix>
 		<Authors>WiiPlayer2</Authors>
 		<RepositoryUrl>https://github.com/WiiPlayer2/DarkLink.OpenFaaS</RepositoryUrl>
