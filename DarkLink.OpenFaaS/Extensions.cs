@@ -58,7 +58,7 @@ public static class Extensions
         });
 
     public static IEndpointConventionBuilder MapFunction(this IEndpointRouteBuilder builder, FunctionContextDelegate function)
-        => builder.MapPost("/", async context =>
+        => builder.Map("/", async context =>
         {
             try
             {
